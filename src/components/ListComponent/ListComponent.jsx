@@ -20,8 +20,8 @@ export default class ListComponent extends React.Component {
             return (
                 <ul className="list-component">
                     {
-                        this.state.tasks.map(item => 
-                            <ListItem task={item}/>
+                        this.state.tasks.map((item, idx) => 
+                            <ListItem key={idx} task={item}/>
                         )
                     }
                 </ul>

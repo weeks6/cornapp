@@ -1,0 +1,10 @@
+.play-component {
+    margin-left: 5.5rem;
+}
+
+@media only screen and (max-width: 600px) {
+    
+    .play-component {
+        margin-left: 0;
+    }
+}
