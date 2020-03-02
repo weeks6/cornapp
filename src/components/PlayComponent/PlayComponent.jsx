@@ -1,52 +1,99 @@
-import React from 'react'
-
-// api 
-import fetchTasks from '../../api/fetchTasks'
+import React, { useState, useContext, useReducer, useEffect} from 'react'
 
 import './PlayComponent.scss'
 import ListComponent from '../ListComponent/ListComponent'
 
-export default class PlayComponent extends React.Component {
+let GlobalState = {
+    isLoading: true,
+    tasks: [],
+    error: null
+}
 
-    constructor() {
-        super()
-        this.state = {
-            isLoading: true,
-            tasks: [],
-            error: null
+export default function PlayComponent() {
+
+    const [innerState, setState] = useState({
+        status: false
+    })
+    
+    const context = useContext(PlayContext)
+    const url = 'https://weeks6.github.io/tasks.json'
+
+    useEffect(() => {
+        if (!innerState.status) {
+            window.fetch(url)
+            .then(response => response.json())
+            .then(data => {
+    
+                console.log(data)
+    
+                context.tasks = [...data, ...GlobalState.tasks]
+                context.isLoading = false
+    
+                setState({
+                    status: true
+                })
+    
+                GlobalState = context
+    
+            }) 
+            .catch(error => GlobalState = {
+                error,
+                isLoading: false
+            })
+    
         }
-    }
+    })
 
-    componentDidMount() {
-        fetchTasks(this)
-    }
+    const PlayProvider = ({ children }) => {
 
-    updateState(updatedChildState) {
-        const { id, text } = updatedChildState
-        const tempList = this.props.tasks
-        tempList[id] = text
-        
-        this.setState({
-            tasks: tempList
-        })
-    }
+        const [state, dispatch] = useReducer((state, action) => {
+            switch (action.type) {
+                case "SAVE_TASK":
 
+                    state.tasks[action.payload.id] = action.payload
 
-    render() {
-        const components = [<h1 style={{marginLeft: 1 +'rem'}}>Play Component</h1>]
+                    return {
+                        ...state 
+                    }
+                default:
+                    return state
+            }
+        }, GlobalState)
 
-        if (!this.isLoading) {
-            components.push(
-                <ListComponent tasks={this.state.tasks} callback={this.updateState}/>)
-        } else {
-            components.push(<h3>Loading...</h3>) 
+        function saveTask(task) {
+            dispatch({
+                type: "SAVE_TASK",
+                payload: task
+            })
         }
-
+    
         return (
-            <div className="container">
-                {components}
-            </div>
+            <PlayContext.Provider value={{
+                tasks: state.tasks,
+                saveTask
+            }}>
+                { children }
+            </PlayContext.Provider>
         )
+    }
         
+
+    if (!context.isLoading) {
+        return (
+            <PlayProvider>
+                <div className="container">
+                    <h1 key={0} style={{marginLeft: 1 +'rem'}}>Play Component</h1>
+                    <ListComponent key={1} status={innerState.status}/>
+                </div>
+            </PlayProvider>
+        )
+    } else {
+        return(
+            <PlayContext.Provider value={1}>
+                <h1 key={0} style={{marginLeft: 6 +'rem'}}>Loading...</h1>
+            </PlayContext.Provider>
+        )
     }
 }
+
+export const PlayContext = React.createContext(GlobalState)

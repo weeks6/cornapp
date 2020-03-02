@@ -1,85 +1,89 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 
-export default class ListItem extends React.Component {
+import { PlayContext } from '../PlayComponent/PlayComponent'
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            id: this.props.task.id,
-            text: this.props.task.text,
+export default function ListItem({task}) {
+
+    const context = useContext(PlayContext)
+
+    const [state, setState] = useState({
+        id: task.id,
+        text: task.text,
+        isHovered: false,
+        isEdit: false
+    })
+
+    const enterHandler = () => {
+        setState({
+            id: state.id,
+            text: state.text,
+            isHovered: true,
+            isEdit: state.isEdit
+        })
+    }
+
+    const leaveHandler = () => {
+        setState({
+            id: state.id,
+            text: state.text,
             isHovered: false,
-            isEdit: false
-        }
-
-        this.enterHandler = () => {
-            this.setState({
-                isHovered: true
-            })
-        }
-
-        this.leaveHandler = () => {
-            this.setState({
-                isHovered: false
-            })
-        }
-
-        this.handleEdit = () => {
-            this.setState({
-                isEdit: !this.state.isEdit
-            })
-        }
-
-        this.handleChange = (event) => {
-            this.setState({
-                text: event.target.value
-            })    
-        }
-
-        this.handleSave = (event) => {
-
-            window.localStorage.setItem(this.state.id, this.state.text)
-            
-            this.props.callback({
-                id: this.state.id,
-                text: this.state.text
-            })
-
-            this.setState({
-                isEdit: !this.state.isEdit
-            })
-            
-            event.preventDefault()
-        }
+            isEdit: state.isEdit
+        })
     }
 
-    render() {
-        if (this.state.isEdit) {
-            return (
-                <li className="list-item"
-                onMouseEnter={this.enterHandler}
-                onMouseLeave={this.leaveHandler}>   
-                    <form onSubmit={this.handleSave} className="edit-form">
-                        <input type="text" value={ this.state.text } onChange={ this.handleChange } className="edit-input"/>  
-                        <div className={ this.state.isEdit ? "item-controls" : "item-controls not-hovered"}>
-                            <i className="material-icons icon" onClick={this.handleSave}>save</i>
-                        </div>
-                    </form>
-                </li>
-            )
-        } else {
-            return(
+    const handleEdit = () => {
+        setState({
+            id: state.id,
+            text: state.text,
+            isHovered: state.isHovered,
+            isEdit: !state.isEdit
+        })
+    }
+
+    const handleChange = (event) => {
+        setState({
+            id: state.id,
+            text: event.target.value,
+            isHovered: state.isHovered,
+            isEdit: state.isEdit
+        })    
+    }
+
+    const handleSave = (event) => {
+        const taskToSave = {
+            id: state.id,
+            text: state.text,
+            isHovered: state.isHovered,
+            isEdit: !state.isEdit
+        }
+        context.saveTask(taskToSave)
+    }
+
+
+    if (state.isEdit) {
+        return (
             <li className="list-item"
-                onMouseEnter={this.enterHandler}
-                onMouseLeave={this.leaveHandler}
-                onDoubleClick={this.handleEdit}>
-                { this.state.text } 
-                <div className={ this.state.isHovered ? "item-controls" : "item-controls not-hovered"}>
-                    <i className="material-icons icon" onClick={this.handleEdit}>edit</i>
-                    <i className="material-icons icon">delete</i>
-                </div>
+            onMouseEnter={() => enterHandler()}
+            onMouseLeave={() => leaveHandler()}>   
+                <form onSubmit={() => handleSave()} className="edit-form">
+                    <input type="text" value={ state.text } onChange={(event) => handleChange(event) } className="edit-input"/>  
+                    <div className={ state.isEdit ? "item-controls" : "item-controls not-hovered"}>
+                        <i className="material-icons icon" onClick={(event) => handleSave(event)}>save</i>
+                    </div>
+                </form>
             </li>
-        )}
-        
-    }
-        
-}
+        )
+    } else {
+        return(
+        <li className="list-item"
+            onMouseEnter={() => enterHandler()}
+            onMouseLeave={() => leaveHandler()}
+            onDoubleClick={() => handleEdit()}>
+            { state.text } 
+            <div className={ state.isHovered ? "item-controls" : "item-controls not-hovered"}>
+                <i className="material-icons icon" onClick={() => handleEdit()}>edit</i>
+                <i className="material-icons icon">delete</i>
+            </div>
+        </li>
+    )}
+}       
