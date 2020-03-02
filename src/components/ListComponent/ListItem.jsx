@@ -4,7 +4,6 @@ export default class ListItem extends React.Component {
 
     constructor(props) {
         super(props)
-        console.log(props)
         this.state = {
             id: this.props.task.id,
             text: this.props.task.text,
@@ -39,14 +38,19 @@ export default class ListItem extends React.Component {
         this.handleSave = (event) => {
 
             window.localStorage.setItem(this.state.id, this.state.text)
+            
+            this.props.callback({
+                id: this.state.id,
+                text: this.state.text
+            })
 
             this.setState({
                 isEdit: !this.state.isEdit
             })
+            
             event.preventDefault()
         }
     }
-
 
     render() {
         if (this.state.isEdit) {

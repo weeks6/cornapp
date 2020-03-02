@@ -11,8 +11,7 @@ export default function fetchTasks(context: React.Component) {
             }
 
             let compiledList = []
-
-            console.log(window.localStorage)
+            
             for (let [key, value] of Object.entries(window.localStorage)) {
                 compiledList.push({
                     id: key,

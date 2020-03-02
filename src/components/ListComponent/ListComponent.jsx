@@ -5,6 +5,10 @@ import ListItem from './ListItem'
 
 export default class ListComponent extends React.Component {
 
+    constructor(props) {
+        super(props)
+    }
+
     componentDidUpdate(prevProps, prevState, snapshot) {
 
         if (this.props !== prevProps) {
@@ -21,7 +25,7 @@ export default class ListComponent extends React.Component {
                 <ul className="list-component">
                     {
                         this.state.tasks.map((item, idx) => 
-                            <ListItem key={idx} task={item}/>
+                            <ListItem key={idx} task={item} callback={this.updateState}/>
                         )
                     }
                 </ul>

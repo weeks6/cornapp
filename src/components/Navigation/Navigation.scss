@@ -32,6 +32,7 @@
 
 .nav-link {
     cursor: pointer;
+    outline: none;
     width: 5rem;
     height: 5rem;
     display: flex;
@@ -39,15 +40,19 @@
     color: #fff;
     text-decoration: none;
     
-    transition: all .4s ease-in-out;
+    transition: all .3s ease-in-out;
 
     & > i {
         min-width: 1.5rem;
         margin: 0 1.75rem;
-        transition: color .4s ease-in-out;
+        transition: color .3s ease-in-out;
     }
 
     &:hover > i {
+        color: #ff9800;
+    }
+
+    &:focus > i {
         color: #ff9800;
     }
 }
